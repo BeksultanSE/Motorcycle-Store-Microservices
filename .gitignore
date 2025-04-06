@@ -1,0 +1,4 @@
+.idea/
+.env
+/order-service/
+/api-gateway
