@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/BeksultanSE/Assignment1-inventory/config"
-	"github.com/BeksultanSE/Assignment1-inventory/internal/repository/http/handler"
+	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/http/handler"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"

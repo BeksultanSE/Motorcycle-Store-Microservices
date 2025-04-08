@@ -7,18 +7,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 
+	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo/dao"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
-	"github.com/BeksultanSE/Assignment1-inventory/internal/repository/mongo/dao"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// ProductRepo represents the repository layer for products
+// ProductRepo represents the adapter layer for products
 type ProductRepo struct {
 	conn       *mongo.Database
 	collection string
 }
 
-// NewProductRepo initializes the product repository
+// NewProductRepo initializes the product adapter
 func NewProductRepo(conn *mongo.Database) *ProductRepo {
 	return &ProductRepo{
 		conn:       conn,

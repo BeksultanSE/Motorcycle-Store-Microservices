@@ -2,8 +2,9 @@ package handler
 
 import (
 	"errors"
+	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/http/handler/dto"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
-	"github.com/BeksultanSE/Assignment1-inventory/internal/repository/http/handler/dto"
+
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"

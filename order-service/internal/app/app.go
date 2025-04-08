@@ -3,18 +3,18 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/BeksultanSE/Assignment1-inventory/config"
-	httpRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/http"
-	mongoRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
-	"github.com/BeksultanSE/Assignment1-inventory/internal/usecase"
-	mongoConn "github.com/BeksultanSE/Assignment1-inventory/pkg/mongo"
+	"github.com/BeksultanSE/Assignment1-order/config"
+	httpRepo "github.com/BeksultanSE/Assignment1-order/internal/adapter/http"
+	mongoRepo "github.com/BeksultanSE/Assignment1-order/internal/adapter/mongo"
+	"github.com/BeksultanSE/Assignment1-order/internal/usecase"
+	mongoConn "github.com/BeksultanSE/Assignment1-order/pkg/mongo"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
-const serviceName = "inventory-service"
+const serviceName = "order-service"
 
 type App struct {
 	httpServer *httpRepo.API
@@ -29,12 +29,15 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 		return nil, fmt.Errorf("error connecting to DB: %v", err)
 	}
 
+	// Initialize repositories
 	aiRepo := mongoRepo.NewAutoInc(mongoDB.Conn)
-	pRepo := mongoRepo.NewProductRepo(mongoDB.Conn)
+	orderRepo := mongoRepo.NewOrderRepo(mongoDB.Conn) // Assuming you have an OrderRepo
 
-	pUsecase := usecase.NewProduct(aiRepo, pRepo)
+	// Initialize use cases
+	orderUsecase := usecase.NewOrder(aiRepo, orderRepo) // Assuming you have an Order use case
 
-	httpServer := httpRepo.New(cfg.Server, pUsecase)
+	// Initialize HTTP server
+	httpServer := httpRepo.New(cfg.Server, orderUsecase)
 
 	app := &App{
 		httpServer: httpServer,
@@ -57,7 +60,6 @@ func (app *App) Start() error {
 	case errRun := <-errCh:
 		return errRun
 	case sig := <-shutdownCh:
-
 		log.Printf(fmt.Sprintf("Received %v signal, shutting down...", sig))
 		app.Stop()
 		log.Println("graceful shutdown completed!")

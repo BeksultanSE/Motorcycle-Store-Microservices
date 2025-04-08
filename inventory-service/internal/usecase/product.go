@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
+	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
-	"github.com/BeksultanSE/Assignment1-inventory/internal/repository/mongo"
 )
 
 type Product struct {
