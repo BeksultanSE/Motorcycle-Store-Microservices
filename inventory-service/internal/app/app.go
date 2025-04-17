@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/BeksultanSE/Assignment1-inventory/config"
-	httpRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/http"
+	grpcAPI "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/grpc"
+	//httpRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/http"
 	mongoRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/usecase"
 	mongoConn "github.com/BeksultanSE/Assignment1-inventory/pkg/mongo"
@@ -17,7 +18,8 @@ import (
 const serviceName = "inventory-service"
 
 type App struct {
-	httpServer *httpRepo.API
+	//httpServer *httpRepo.API
+	grpcServer *grpcAPI.ServerAPI
 }
 
 func New(ctx context.Context, cfg *config.Config) (*App, error) {
@@ -34,10 +36,12 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 
 	pUsecase := usecase.NewProduct(aiRepo, pRepo)
 
-	httpServer := httpRepo.New(cfg.Server, pUsecase)
+	//httpServer := httpRepo.New(cfg.Server, pUsecase)
+	grpcServer := grpcAPI.New(cfg.Server, pUsecase)
 
 	app := &App{
-		httpServer: httpServer,
+		//httpServer: httpServer,
+		grpcServer: grpcServer,
 	}
 
 	return app, nil
@@ -46,7 +50,8 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 func (app *App) Start() error {
 	errCh := make(chan error)
 
-	app.httpServer.Run(errCh)
+	//app.httpServer.Run(errCh)
+	app.grpcServer.Run(errCh)
 
 	log.Printf(fmt.Sprintf("Starting %s service...", serviceName))
 
@@ -66,7 +71,8 @@ func (app *App) Start() error {
 }
 
 func (app *App) Stop() {
-	err := app.httpServer.Stop()
+	//err := app.httpServer.Stop()
+	err := app.grpcServer.Stop()
 	if err != nil {
 		log.Println("failed to shutdown http service:", err)
 	}

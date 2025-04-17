@@ -1,0 +1,13 @@
+version: "3"
+
+tasks:
+  generate:
+    aliases:
+      - gen
+    desc: "Generate code from proto files"
+    cmds:
+      - protoc -I pkg/protos/proto pkg/protos/proto/*.proto --go_out=./pkg/protos/gen/golang/ --go_opt=paths=source_relative --go-grpc_out=./pkg/protos/gen/golang/ --go-grpc_opt=paths=source_relative
+  run:
+    cmds:
+      - go run ./cmd/main.go
+

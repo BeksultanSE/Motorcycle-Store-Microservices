@@ -45,11 +45,11 @@ func (o *Order) Get(ctx context.Context, filter domain.OrderFilter) (domain.Orde
 }
 
 func (o *Order) GetAll(ctx context.Context, filter domain.OrderFilter, page, limit int64) ([]domain.Order, int64, error) {
-	orders, totalCount, err := o.repo.GetAllWithFilter(ctx, filter, page, limit)
+	orders, total, err := o.repo.GetAllWithFilter(ctx, filter, page, limit)
 	if err != nil {
 		return nil, 0, err
 	}
-	return orders, totalCount, nil
+	return orders, total, nil
 }
 
 func (o *Order) Update(ctx context.Context, filter domain.OrderFilter, updated domain.OrderUpdateData) error {

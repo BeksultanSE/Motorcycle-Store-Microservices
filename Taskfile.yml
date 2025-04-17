@@ -1,0 +1,22 @@
+version: '3'
+
+tasks:
+  gateway:
+    cmds:
+      - cd ./api-gateway && go run ./cmd/main.go
+    interactive: true
+
+  inventory:
+    cmds:
+      - cd ./inventory-service && go run ./cmd/main.go
+    interactive: true
+
+  order:
+    cmds:
+      - cd ./order-service && go run ./cmd/main.go
+    interactive: true
+
+  user:
+    cmds:
+      - cd ./user-service && go run ./cmd/main.go
+    interactive: true

@@ -36,11 +36,11 @@ func (h *OrderHandler) Create(ctx *gin.Context) {
 func (h *OrderHandler) GetByID(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 64)
+	log.Println("Getting order with id:", idStr)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid order ID"})
 		return
 	}
-
 	filter := domain.OrderFilter{ID: &id}
 	order, err := h.uc.Get(ctx.Request.Context(), filter)
 	if err != nil {
