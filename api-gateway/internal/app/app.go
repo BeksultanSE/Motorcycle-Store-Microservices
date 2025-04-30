@@ -30,6 +30,7 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	}
 
 	handler := handlers.NewHandler(grpcClients)
+
 	httpServer := http.NewServer(*cfg, handler)
 
 	app := &App{

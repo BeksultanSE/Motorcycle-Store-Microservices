@@ -13,7 +13,12 @@ service OrderService {
 
 message CreateOrderRequest {
   uint64 user_id = 1;
-  repeated OrderItem items = 2;
+  repeated CreateOrderItem items = 2;
+}
+
+message CreateOrderItem {
+  uint64 product_id = 1;
+  uint64 quantity = 2;
 }
 
 message OrderItem {
@@ -26,17 +31,12 @@ message OrderItem {
 
 message GetOrderRequest {
   uint64 order_id = 1;
+  uint64 user_id = 2;
 }
 
 message UpdateOrderRequest {
   uint64 order_id = 1;
   string status = 2;
-}
-
-message ListOrdersRequest {
-  uint64 user_id = 1;
-  int64 page = 2;
-  int64 limit = 3;
 }
 
 message OrderResponse {
@@ -47,6 +47,12 @@ message OrderResponse {
   string status = 5;
   string created_at = 6;
   string updated_at = 7;
+}
+
+message ListOrdersRequest {
+  uint64 user_id = 1;
+  int64 page = 2;
+  int64 limit = 3;
 }
 
 message ListOrdersResponse {

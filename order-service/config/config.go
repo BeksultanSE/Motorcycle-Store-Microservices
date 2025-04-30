@@ -12,9 +12,10 @@ import (
 
 type (
 	Config struct {
-		Mongo   mongo.Config
-		Server  Server
-		Version string `env:"VERSION"`
+		Mongo    mongo.Config
+		Server   Server
+		Version  string `env:"VERSION"`
+		Services Microservices
 	}
 
 	Server struct {
@@ -34,6 +35,16 @@ type (
 	GRPCServer struct {
 		Port    int           `env:"GRPC_PORT,required"`
 		Timeout time.Duration `env:"GRPC_TIMEOUT" envDefault:"30s"`
+	}
+
+	Microservices struct {
+		InventoryService ServiceConfig `envPrefix:"INVENTORY_SERVICE_"`
+		//if you need other clients...
+	}
+
+	ServiceConfig struct {
+		Host string `env:"HOST,required"`
+		Port int    `env:"PORT,required"`
 	}
 )
 

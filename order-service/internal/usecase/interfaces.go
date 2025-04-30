@@ -17,3 +17,7 @@ type OrderRepository interface {
 	GetAllWithFilter(ctx context.Context, filter domain.OrderFilter, page, limit int64) ([]domain.Order, int64, error)
 	Delete(ctx context.Context, filter domain.OrderFilter) error
 }
+
+type InventoryClient interface {
+	GetProduct(ctx context.Context, productID uint64) (domain.Product, error)
+}

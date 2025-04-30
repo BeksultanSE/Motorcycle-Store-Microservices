@@ -8,7 +8,12 @@ import (
 
 type CreateOrderRequestDTO struct {
 	UserID uint64
-	Items  []OrderItemDTO
+	Items  []CreateOrderItemDTO
+}
+
+type CreateOrderItemDTO struct {
+	ProductID uint64
+	Quantity  uint64
 }
 
 type OrderItemDTO struct {
@@ -31,6 +36,7 @@ type OrderResponseDTO struct {
 
 type GetOrderRequestDTO struct {
 	OrderID uint64
+	UserID  uint64
 }
 
 type UpdateOrderRequestDTO struct {
@@ -45,14 +51,11 @@ type ListOrdersRequestDTO struct {
 }
 
 func FromCreateOrderRequestProto(req *order.CreateOrderRequest) *CreateOrderRequestDTO {
-	items := make([]OrderItemDTO, len(req.Items))
+	items := make([]CreateOrderItemDTO, len(req.Items))
 	for i, item := range req.Items {
-		items[i] = OrderItemDTO{
-			ProductID:  item.ProductId,
-			Name:       item.Name,
-			Price:      item.Price,
-			Quantity:   item.Quantity,
-			TotalPrice: item.TotalPrice,
+		items[i] = CreateOrderItemDTO{
+			ProductID: item.ProductId,
+			Quantity:  item.Quantity,
 		}
 	}
 	return &CreateOrderRequestDTO{
@@ -65,17 +68,13 @@ func (d *CreateOrderRequestDTO) ToDomainOrder() domain.Order {
 	items := make([]domain.OrderItem, len(d.Items))
 	for i, item := range d.Items {
 		items[i] = domain.OrderItem{
-			ProductID:  item.ProductID,
-			Name:       item.Name,
-			Price:      item.Price,
-			Quantity:   item.Quantity,
-			TotalPrice: item.TotalPrice,
+			ProductID: item.ProductID,
+			Quantity:  item.Quantity,
 		}
 	}
 	return domain.Order{
 		UserID: d.UserID,
 		Items:  items,
-		Status: domain.StatusPending,
 	}
 }
 
@@ -126,6 +125,7 @@ func (d *OrderResponseDTO) ToProtoOrderResponse() *order.OrderResponse {
 func FromGetOrderRequestProto(req *order.GetOrderRequest) *GetOrderRequestDTO {
 	return &GetOrderRequestDTO{
 		OrderID: req.OrderId,
+		UserID:  req.UserId,
 	}
 }
 

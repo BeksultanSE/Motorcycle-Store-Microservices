@@ -18,8 +18,6 @@ type Order struct {
 
 type OrderItem struct {
 	ProductID  uint64  `bson:"productId"`
-	Name       string  `bson:"name"`
-	Price      float64 `bson:"price"`
 	Quantity   uint64  `bson:"quantity"`
 	TotalPrice float64 `bson:"totalPrice"`
 }
@@ -69,8 +67,6 @@ func ToOrderItemList(daoItems []OrderItem) []domain.OrderItem {
 	for i, item := range daoItems {
 		items[i] = domain.OrderItem{
 			ProductID:  item.ProductID,
-			Name:       item.Name,
-			Price:      item.Price,
 			Quantity:   item.Quantity,
 			TotalPrice: item.TotalPrice,
 		}
@@ -83,8 +79,6 @@ func FromOrderItemList(items []domain.OrderItem) []OrderItem {
 	for i, item := range items {
 		daoItems[i] = OrderItem{
 			ProductID:  item.ProductID,
-			Name:       item.Name,
-			Price:      item.Price,
 			Quantity:   item.Quantity,
 			TotalPrice: item.TotalPrice,
 		}

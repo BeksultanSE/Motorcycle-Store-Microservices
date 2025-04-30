@@ -16,7 +16,7 @@ func (h *Handler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	var items []*protos.OrderItem
+	var items []*protos.CreateOrderItem
 	if err := c.ShouldBindJSON(&items); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		log.Println(err)
@@ -29,6 +29,83 @@ func (h *Handler) CreateOrder(c *gin.Context) {
 	}
 
 	resp, err := h.Clients.Order.CreateOrder(c.Request.Context(), req)
+	if err != nil {
+		code, msg := mapGRPCErrorToHTTP(err)
+		c.JSON(code, gin.H{"error": msg})
+		return
+	}
+
+	jsonBytes, err := protojson.Marshal(resp)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to marshal response"})
+		return
+	}
+
+	c.Data(http.StatusOK, "application/json", jsonBytes)
+}
+func (h *Handler) GetOrder(c *gin.Context) {
+	UserId, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user not authenticated"})
+		return
+	}
+
+	orderIDStr := c.Param("id")
+	orderID, err := strconv.ParseUint(orderIDStr, 10, 64)
+	if err != nil {
+		log.Printf(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid order ID"})
+		return
+	}
+
+	req := &protos.GetOrderRequest{
+		OrderId: orderID,
+	}
+
+	resp, err := h.Clients.Order.GetOrder(c.Request.Context(), req)
+	if err != nil {
+		code, msg := mapGRPCErrorToHTTP(err)
+		c.JSON(code, gin.H{"error": msg})
+		return
+	}
+
+	if resp.UserId != UserId && UserId != 1 {
+		c.JSON(http.StatusForbidden, gin.H{"error": "invalid order ID, not allowed for current user"})
+		return
+	}
+
+	jsonBytes, err := protojson.Marshal(resp)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to marshal response"})
+		return
+	}
+
+	c.Data(http.StatusOK, "application/json", jsonBytes)
+}
+
+func (h *Handler) UpdateOrder(c *gin.Context) {
+	_, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user not authenticated"})
+		return
+	}
+
+	orderIDStr := c.Param("id")
+	orderID, err := strconv.ParseUint(orderIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid order ID"})
+		return
+	}
+
+	var req protos.UpdateOrderRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		return
+	}
+
+	req.OrderId = orderID
+
+	resp, err := h.Clients.Order.UpdateOrder(c.Request.Context(), &req)
 	if err != nil {
 		code, msg := mapGRPCErrorToHTTP(err)
 		c.JSON(code, gin.H{"error": msg})

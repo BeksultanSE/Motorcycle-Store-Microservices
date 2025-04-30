@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/BeksultanSE/Assignment1-order/config"
 	grpcAPI "github.com/BeksultanSE/Assignment1-order/internal/adapter/grpc"
+	gclients "github.com/BeksultanSE/Assignment1-order/internal/adapter/grpc/clients"
 	mongoRepo "github.com/BeksultanSE/Assignment1-order/internal/adapter/mongo"
 	"github.com/BeksultanSE/Assignment1-order/internal/usecase"
 	mongoConn "github.com/BeksultanSE/Assignment1-order/pkg/mongo"
@@ -18,7 +19,8 @@ const serviceName = "order-service"
 
 type App struct {
 	//httpServer *httpRepo.API
-	grpcServer *grpcAPI.ServerAPI
+	grpcServer  *grpcAPI.ServerAPI
+	grpcClients *gclients.Clients
 }
 
 func New(ctx context.Context, cfg *config.Config) (*App, error) {
@@ -31,9 +33,15 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	}
 
 	aiRepo := mongoRepo.NewAutoInc(mongoDB.Conn)
-	orderRepo := mongoRepo.NewOrderRepo(mongoDB.Conn) // Assuming you have an OrderRepo
+	orderRepo := mongoRepo.NewOrderRepo(mongoDB.Conn)
 
-	orderUsecase := usecase.NewOrder(aiRepo, orderRepo) // Assuming you have an Order use case
+	grpcClients, err := gclients.NewClients(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize gRPC clients: %w", err)
+	}
+	inventoryClient := gclients.NewInventoryClient(grpcClients.Inventory)
+
+	orderUsecase := usecase.NewOrder(aiRepo, orderRepo, inventoryClient)
 
 	//httpServer := httpRepo.New(cfg.Server, orderUsecase)
 	grpcServer := grpcAPI.New(cfg.Server, orderUsecase)
@@ -74,4 +82,5 @@ func (app *App) Stop() {
 	if err != nil {
 		log.Println("failed to shutdown http service:", err)
 	}
+	app.grpcClients.Close()
 }
