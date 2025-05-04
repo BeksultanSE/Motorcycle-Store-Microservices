@@ -16,6 +16,7 @@ type (
 		Server   Server
 		Version  string `env:"VERSION"`
 		Services Microservices
+		Brokers  []string `env:"BROKERS"`
 	}
 
 	Server struct {

@@ -12,13 +12,15 @@ type Order struct {
 	aiRepo          AutoIncRepo
 	repo            OrderRepository
 	inventoryClient InventoryClient
+	eventPublisher  EventPublisher
 }
 
-func NewOrder(aiRepo AutoIncRepo, repo OrderRepository, client InventoryClient) *Order {
+func NewOrder(aiRepo AutoIncRepo, repo OrderRepository, client InventoryClient, publisher EventPublisher) *Order {
 	return &Order{
 		aiRepo:          aiRepo,
 		repo:            repo,
 		inventoryClient: client,
+		eventPublisher:  publisher,
 	}
 }
 
@@ -32,6 +34,10 @@ func (o *Order) Create(ctx context.Context, order domain.Order) (domain.Order, e
 
 		if product.Stock < item.Quantity {
 			return domain.Order{}, errors.New("insufficient stock for product: " + product.Name)
+		}
+
+		if item.Quantity <= 0 {
+			return domain.Order{}, errors.New("invalid quantity for product, must be at positive amount: " + product.Name)
 		}
 
 		order.Items[i].Name = product.Name
@@ -56,6 +62,11 @@ func (o *Order) Create(ctx context.Context, order domain.Order) (domain.Order, e
 	if err != nil {
 		return domain.Order{}, err
 	}
+
+	if err := o.eventPublisher.PublishOrderCreated(ctx, order); err != nil {
+		return domain.Order{}, err
+	}
+
 	return domain.Order{
 		ID:     order.ID,
 		UserID: order.UserID,

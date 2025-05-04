@@ -21,3 +21,7 @@ type OrderRepository interface {
 type InventoryClient interface {
 	GetProduct(ctx context.Context, productID uint64) (domain.Product, error)
 }
+
+type EventPublisher interface {
+	PublishOrderCreated(ctx context.Context, event domain.Order) error
+}

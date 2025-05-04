@@ -11,10 +11,10 @@ import (
 
 type (
 	Config struct {
-		Mongo  mongo.Config
-		Server Server
-
-		Version string `env:"VERSION"`
+		Mongo   mongo.Config
+		Server  Server
+		Brokers []string `env:"BROKERS"`
+		Version string   `env:"VERSION"`
 	}
 
 	Server struct {

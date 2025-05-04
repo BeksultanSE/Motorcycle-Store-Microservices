@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
+	"time"
 )
 
 type Product struct {
@@ -51,6 +52,10 @@ func (p *Product) GetAll(ctx context.Context, pf domain.ProductFilter, page, lim
 }
 
 func (p *Product) Update(ctx context.Context, filter domain.ProductFilter, updated domain.ProductUpdateData) error {
+	if *updated.Stock < uint64(0) {
+		return domain.ErrInsufficientStock
+	}
+	updated.UpdatedAt = func() *time.Time { t := time.Now(); return &t }()
 	err := p.repo.Update(ctx, filter, updated)
 	if err != nil {
 		return err

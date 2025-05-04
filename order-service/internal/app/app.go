@@ -6,6 +6,7 @@ import (
 	"github.com/BeksultanSE/Assignment1-order/config"
 	grpcAPI "github.com/BeksultanSE/Assignment1-order/internal/adapter/grpc"
 	gclients "github.com/BeksultanSE/Assignment1-order/internal/adapter/grpc/clients"
+	"github.com/BeksultanSE/Assignment1-order/internal/adapter/kafka"
 	mongoRepo "github.com/BeksultanSE/Assignment1-order/internal/adapter/mongo"
 	"github.com/BeksultanSE/Assignment1-order/internal/usecase"
 	mongoConn "github.com/BeksultanSE/Assignment1-order/pkg/mongo"
@@ -21,6 +22,7 @@ type App struct {
 	//httpServer *httpRepo.API
 	grpcServer  *grpcAPI.ServerAPI
 	grpcClients *gclients.Clients
+	kafkaProd   *kafka.Producer
 }
 
 func New(ctx context.Context, cfg *config.Config) (*App, error) {
@@ -41,7 +43,12 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	}
 	inventoryClient := gclients.NewInventoryClient(grpcClients.Inventory)
 
-	orderUsecase := usecase.NewOrder(aiRepo, orderRepo, inventoryClient)
+	producer, err := kafka.NewKafkaProducer(cfg.Brokers, "order.created")
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize kafka producer: %w", err)
+	}
+
+	orderUsecase := usecase.NewOrder(aiRepo, orderRepo, inventoryClient, producer)
 
 	//httpServer := httpRepo.New(cfg.Server, orderUsecase)
 	grpcServer := grpcAPI.New(cfg.Server, orderUsecase)
@@ -83,4 +90,7 @@ func (app *App) Stop() {
 		log.Println("failed to shutdown http service:", err)
 	}
 	app.grpcClients.Close()
+	if err := app.kafkaProd.Close(); err != nil {
+		log.Println("failed to close Kafka producer:", err)
+	}
 }

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package events;
+
+option go_package = "./proto";
+
+message OrderCreatedEvent {
+  uint64 order_id = 1;
+  uint64 user_id = 2;
+  repeated OrderItemEvent items = 3;
+}
+
+message OrderItemEvent {
+  uint64 product_id = 1;
+  uint64 quantity = 2;
+}
+
