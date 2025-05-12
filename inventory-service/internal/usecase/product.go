@@ -76,6 +76,12 @@ func (p *Product) Update(ctx context.Context, filter domain.ProductFilter, updat
 	if err != nil {
 		return err
 	}
+
+	// Invalidate the cache for the updated product
+	if err = p.cache.Delete(ctx, *filter.ID); err != nil {
+		log.Printf("Failed to invalidate cache for product %d: %v", *filter.ID, err)
+	}
+
 	return nil
 }
 
@@ -84,5 +90,11 @@ func (p *Product) Delete(ctx context.Context, filter domain.ProductFilter) error
 	if err != nil {
 		return err
 	}
+
+	// Invalidate the cache for the deleted product
+	if err := p.cache.Delete(ctx, *filter.ID); err != nil {
+		log.Printf("Failed to invalidate cache for product %d: %v", *filter.ID, err)
+	}
+
 	return nil
 }
