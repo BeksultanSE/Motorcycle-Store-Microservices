@@ -3,7 +3,6 @@ package dto
 import (
 	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
 	proto "github.com/BeksultanSE/Assignment1-inventory/protos/gen/golang"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 )
 
@@ -90,8 +89,8 @@ func (d *ProductResponse) ToProtoProductResponse() *proto.ProductResponse {
 		Category:  d.Category,
 		Price:     d.Price,
 		Stock:     d.Stock,
-		CreatedAt: timestamppb.New(d.CreatedAt).String(),
-		UpdatedAt: timestamppb.New(d.UpdatedAt).String(),
+		CreatedAt: d.CreatedAt.String(),
+		UpdatedAt: d.UpdatedAt.String(),
 	}
 }
 

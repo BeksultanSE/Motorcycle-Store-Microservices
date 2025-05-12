@@ -4,18 +4,21 @@ import (
 	"context"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
+	"log"
 	"time"
 )
 
 type Product struct {
 	aiRepo auto_inc_Repo
 	repo   product_Repo
+	cache  ProductCache
 }
 
-func NewProduct(aiRepo auto_inc_Repo, repo product_Repo) *Product {
+func NewProduct(aiRepo auto_inc_Repo, repo product_Repo, cache ProductCache) *Product {
 	return &Product{
 		aiRepo: aiRepo,
 		repo:   repo,
+		cache:  cache,
 	}
 }
 
@@ -25,6 +28,8 @@ func (p *Product) Create(ctx context.Context, product domain.Product) (domain.Pr
 		return domain.Product{}, err
 	}
 	product.ID = id
+	product.CreatedAt = time.Now()
+	product.UpdatedAt = time.Now()
 	err = p.repo.Create(ctx, product)
 	if err != nil {
 		return domain.Product{}, err
@@ -36,9 +41,20 @@ func (p *Product) Create(ctx context.Context, product domain.Product) (domain.Pr
 }
 
 func (p *Product) Get(ctx context.Context, pf domain.ProductFilter) (domain.Product, error) {
+	cachedProduct, err := p.cache.Get(ctx, *pf.ID)
+	if err == nil && cachedProduct != (domain.Product{}) {
+		log.Println("Cache hit:", cachedProduct)
+		return cachedProduct, nil
+	}
+
 	product, err := p.repo.GetWithFilter(ctx, pf)
 	if err != nil {
 		return domain.Product{}, err
+	}
+
+	//caching
+	if err = p.cache.Set(ctx, product); err != nil {
+		log.Printf("Failed to cache product %d: %v", product.ID, err)
 	}
 	return product, nil
 }

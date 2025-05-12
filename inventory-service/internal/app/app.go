@@ -6,8 +6,9 @@ import (
 	"github.com/BeksultanSE/Assignment1-inventory/config"
 	grpcAPI "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/grpc"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/kafka"
+	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/redis"
+	redisconn "github.com/BeksultanSE/Assignment1-inventory/pkg/redis"
 	"github.com/IBM/sarama"
-
 	//httpRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/http"
 	mongoRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/usecase"
@@ -40,7 +41,17 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	aiRepo := mongoRepo.NewAutoInc(mongoDB.Conn)
 	pRepo := mongoRepo.NewProductRepo(mongoDB.Conn)
 
-	pUsecase := usecase.NewProduct(aiRepo, pRepo)
+	// connecting to redis client
+	redisClient, err := redisconn.NewClient(ctx, redisconn.Config(cfg.Redis))
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to Redis: %v", err)
+	}
+	log.Println("Connected to Redis:", redisClient.Ping(ctx) == nil)
+
+	// redis cache
+	productRedisCache := redis.NewRedisCache(redisClient, cfg.Cache.TTL)
+	
+	pUsecase := usecase.NewProduct(aiRepo, pRepo, productRedisCache)
 
 	//httpServer := httpRepo.New(cfg.Server, pUsecase)
 	grpcServer := grpcAPI.New(cfg.Server, pUsecase)

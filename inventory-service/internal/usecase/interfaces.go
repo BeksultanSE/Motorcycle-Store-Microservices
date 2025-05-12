@@ -15,3 +15,10 @@ type product_Repo interface {
 	GetListWithFilter(ctx context.Context, filter domain.ProductFilter, page, limit int64) ([]domain.Product, int, error)
 	Delete(ctx context.Context, filter domain.ProductFilter) error
 }
+
+type ProductCache interface {
+	Get(ctx context.Context, productID uint64) (domain.Product, error)
+	Set(ctx context.Context, product domain.Product) error
+	SetMany(ctx context.Context, products []domain.Product) error
+	Delete(ctx context.Context, productID uint64) error
+}
