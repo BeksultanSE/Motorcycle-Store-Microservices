@@ -37,7 +37,7 @@ func (o *Order) Create(ctx context.Context, order domain.Order) (domain.Order, e
 		}
 
 		if item.Quantity <= 0 {
-			return domain.Order{}, errors.New("invalid quantity for product, must be at positive amount: " + product.Name)
+			return domain.Order{}, errors.New("invalid quantity for product, must be positive amount: " + product.Name)
 		}
 
 		order.Items[i].Name = product.Name

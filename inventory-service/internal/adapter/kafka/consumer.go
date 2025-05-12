@@ -36,12 +36,13 @@ func (h *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim saram
 
 		for _, item := range event.Items {
 			filter := domain.ProductFilter{ID: &item.ProductId}
+			//updating the stock
 			currentProduct, err := h.usecase.Get(session.Context(), filter)
 			if err != nil {
 				log.Printf("Failed to get product from consumer: %v", err)
 			}
-			// Placeholder; in practice, fetch current stock from repo
 			newStock := currentProduct.Stock - item.Quantity
+
 			update := domain.ProductUpdateData{
 				Stock: &newStock,
 			}

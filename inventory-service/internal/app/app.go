@@ -19,6 +19,7 @@ import (
 )
 
 const serviceName = "inventory-service"
+const consumerGroupName = "inventory-consumer-group"
 
 type App struct {
 	//httpServer *httpRepo.API
@@ -46,7 +47,7 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 
 	kafkaConfig := sarama.NewConfig()
 	kafkaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
-	consumerGroup, err := sarama.NewConsumerGroup(cfg.Brokers, "inventory-consumer-group", kafkaConfig)
+	consumerGroup, err := sarama.NewConsumerGroup(cfg.Brokers, consumerGroupName, kafkaConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create consumer group: %w", err)
 	}
