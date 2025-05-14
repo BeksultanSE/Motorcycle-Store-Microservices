@@ -50,7 +50,7 @@ type (
 
 	//Cache configuration
 	Cache struct {
-		TTL time.Duration `env:"CACHE_TTL" envDefault:"24h"`
+		TTL time.Duration `env:"CACHE_TTL" envDefault:"10h"`
 		//refresh config if needed
 	}
 )

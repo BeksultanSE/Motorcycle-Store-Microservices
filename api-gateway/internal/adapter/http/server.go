@@ -8,6 +8,7 @@ import (
 	"github.com/BeksultanSE/Assignment1-api-gateway/internal/adapter/http/handler"
 	"github.com/BeksultanSE/Assignment1-api-gateway/internal/adapter/http/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"os"
@@ -32,6 +33,7 @@ func NewServer(cfg config.Config, handler *handler.Handler) *Server {
 	r := gin.New()
 
 	r.Use(gin.Recovery())
+	r.Use(gin.Logger())
 
 	api := &Server{
 		httpServer: r,
@@ -46,6 +48,12 @@ func NewServer(cfg config.Config, handler *handler.Handler) *Server {
 }
 
 func (s *Server) setupRoutes() {
+	//exporting metrics
+	middleware.PrometheusInit()
+	s.httpServer.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	s.httpServer.Use(middleware.TrackMetrics())
+
+	//api routes setup
 	v1 := s.httpServer.Group("/api/v1")
 
 	v1.POST("/users/register", s.handler.RegisterUser)

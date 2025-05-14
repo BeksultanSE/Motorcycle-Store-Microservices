@@ -1,6 +1,62 @@
 version: '3.8'
 
 services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./api-gateway/.env
+    environment:
+      - ORDER_SERVICE_HOST=assignment1-order-service-1
+      - USER_SERVICE_HOST=assignment1-user-service-1
+      - INVENTORY_SERVICE_HOST=assignment1-inventory-service-1
+    networks:
+      - app-network
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+    ports:
+      - "4001:4001"
+    env_file:
+      - ./inventory-service/.env
+    environment:
+      - MONGO_DB_URI=host.docker.internal:27017
+      - MONGO_DB=inventory-service
+      - REDIS_HOSTS=redis:6379
+      - BROKERS=kafka:9092
+    networks:
+      - app-network
+
+  order-service:
+    build:
+      context: ./order-service
+    ports:
+      - "4002:4002"
+    env_file:
+      - ./order-service/.env
+    environment:
+      - MONGO_DB_URI=host.docker.internal:27017
+      - MONGO_DB=order-service
+      - BROKERS=kafka:9092
+      - INVENTORY_SERVICE_HOST=assignment1-inventory-service-1
+    networks:
+      - app-network
+
+  user-service:
+    build:
+      context: ./user-service
+    ports:
+      - "4003:4003"
+    env_file:
+      - ./user-service/.env
+    environment:
+      - MONGO_DB_URI=host.docker.internal:27017
+      - MONGO_DB=user-service
+    networks:
+      - app-network
 
   redis:
     image: redis:latest
@@ -13,13 +69,18 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - app-network
+
   kafka:
     image: confluentinc/cp-kafka:latest
+    container_name: kafka
     depends_on:
       - zookeeper
     ports:
@@ -27,8 +88,34 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - app-network
+
+# monitoring tools
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - app-network
+    depends_on:
+      - prometheus
+
 
 networks:
   app-network:
