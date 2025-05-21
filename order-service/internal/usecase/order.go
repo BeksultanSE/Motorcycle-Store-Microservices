@@ -56,9 +56,8 @@ func (o *Order) Create(ctx context.Context, order domain.Order) (domain.Order, e
 	if err != nil {
 		return domain.Order{}, err
 	}
-	order.ID = id
 
-	err = o.repo.Create(ctx, order)
+	err = o.repo.Create(ctx, order, id)
 	if err != nil {
 		return domain.Order{}, err
 	}

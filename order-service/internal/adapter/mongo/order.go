@@ -23,11 +23,31 @@ func NewOrderRepo(conn *mongo.Database) *OrderRepo {
 	}
 }
 
-func (o *OrderRepo) Create(ctx context.Context, order domain.Order) error {
-	orderDoc := dao.FromOrder(order)
-	_, err := o.conn.Collection(o.collection).InsertOne(ctx, orderDoc)
+func (o *OrderRepo) Create(ctx context.Context, order domain.Order, id uint64) error {
+	// Start a MongoDB session
+	session, err := o.conn.Client().StartSession()
 	if err != nil {
-		return fmt.Errorf("failed to create order with ID %d: %w", order.ID, err)
+		return fmt.Errorf("failed to start session: %w", err)
+	}
+	defer session.EndSession(ctx)
+
+	// Use WithTransaction to manage the transaction lifecycle
+	err = mongo.WithSession(ctx, session, func(sessionContext mongo.SessionContext) error {
+		order.ID = id
+
+		orderDoc := dao.FromOrder(order)
+		_, err := o.conn.Collection(o.collection).InsertOne(sessionContext, orderDoc)
+		if err != nil {
+			return fmt.Errorf("failed to create order with ID %d: %w", order.ID, err)
+		}
+
+		return nil // Commit will occur if no error is returned
+	})
+	if err != nil {
+		if abortErr := session.AbortTransaction(ctx); abortErr != nil {
+			log.Printf("failed to abort transaction: %v", abortErr)
+		}
+		return fmt.Errorf("transaction failed: %w", err)
 	}
 
 	return nil

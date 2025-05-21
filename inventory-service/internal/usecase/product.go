@@ -35,8 +35,10 @@ func (p *Product) Create(ctx context.Context, product domain.Product) (domain.Pr
 		return domain.Product{}, err
 	}
 	return domain.Product{
-		ID:   id,
-		Name: product.Name,
+		ID:        id,
+		Name:      product.Name,
+		CreatedAt: product.CreatedAt,
+		UpdatedAt: product.UpdatedAt,
 	}, nil
 }
 

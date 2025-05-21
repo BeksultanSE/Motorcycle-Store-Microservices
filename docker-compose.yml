@@ -1,6 +1,24 @@
 version: '3.8'
 
 services:
+  mongodb:
+    image: mongo:6.0
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+    command: mongod --replSet rs0 --bind_ip_all
+    healthcheck:
+      test: |
+        bash -c 'mongosh --host mongodb --port 27017 --eval "try { rs.status() } catch (err) { rs.initiate({\"_id\": \"rs0\", \"members\": [{\"_id\": 0, \"host\": \"mongodb:27017\"}]}) }"'
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 90s
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -23,12 +41,16 @@ services:
     env_file:
       - ./inventory-service/.env
     environment:
-      - MONGO_DB_URI=host.docker.internal:27017
+      - MONGO_DB_URI=mongodb:27017/inventory-service
+      - MONGO_DB_REPLICA_SET=rs0
       - MONGO_DB=inventory-service
       - REDIS_HOSTS=redis:6379
       - BROKERS=kafka:9092
     networks:
       - app-network
+    depends_on:
+      - kafka
+      - zookeeper
 
   order-service:
     build:
@@ -38,12 +60,16 @@ services:
     env_file:
       - ./order-service/.env
     environment:
-      - MONGO_DB_URI=host.docker.internal:27017
+      - MONGO_DB_URI=mongodb:27017/order-service
+      - MONGO_DB_REPLICA_SET=rs0
       - MONGO_DB=order-service
       - BROKERS=kafka:9092
       - INVENTORY_SERVICE_HOST=inventory-service
     networks:
       - app-network
+    depends_on:
+      - kafka
+      - zookeeper
 
   user-service:
     build:
@@ -53,7 +79,8 @@ services:
     env_file:
       - ./user-service/.env
     environment:
-      - MONGO_DB_URI=host.docker.internal:27017
+      - MONGO_DB_URI=mongodb:27017/user-service
+      - MONGO_DB_REPLICA_SET=rs0
       - MONGO_DB=user-service
     networks:
       - app-network
@@ -103,7 +130,7 @@ services:
   grafana:
     image: grafana/grafana-oss:latest
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     networks:
@@ -111,6 +138,8 @@ services:
     depends_on:
       - prometheus
 
+volumes:
+  mongo-data:
 
 networks:
   app-network:

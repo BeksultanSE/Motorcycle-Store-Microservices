@@ -24,6 +24,11 @@ func NewDB(ctx context.Context, cfg Config) (*DB, error) {
 	// Set up client options
 	clientOptions := options.Client().ApplyURI(connectURL)
 
+	if cfg.ReplicaSet != "" {
+		clientOptions.SetReplicaSet(cfg.ReplicaSet)
+		fmt.Printf("Connecting to replica set %s\n", cfg.ReplicaSet)
+	}
+
 	// Connect to MongoDB
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {

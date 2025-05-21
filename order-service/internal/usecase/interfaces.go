@@ -11,7 +11,7 @@ type AutoIncRepo interface {
 
 // OrderRepository defines the contract for order data operations
 type OrderRepository interface {
-	Create(ctx context.Context, order domain.Order) error
+	Create(ctx context.Context, order domain.Order, id uint64) error
 	Update(ctx context.Context, filter domain.OrderFilter, update domain.OrderUpdateData) error
 	GetWithFilter(ctx context.Context, filter domain.OrderFilter) (domain.Order, error)
 	GetAllWithFilter(ctx context.Context, filter domain.OrderFilter, page, limit int64) ([]domain.Order, int64, error)
