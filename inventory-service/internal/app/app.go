@@ -3,20 +3,23 @@ package app
 import (
 	"context"
 	"fmt"
+
 	"github.com/BeksultanSE/Assignment1-inventory/config"
 	grpcAPI "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/grpc"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/kafka"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/redis"
 	redisconn "github.com/BeksultanSE/Assignment1-inventory/pkg/redis"
 	"github.com/IBM/sarama"
+
 	//httpRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/http"
-	mongoRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
-	"github.com/BeksultanSE/Assignment1-inventory/internal/usecase"
-	mongoConn "github.com/BeksultanSE/Assignment1-inventory/pkg/mongo"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	mongoRepo "github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
+	"github.com/BeksultanSE/Assignment1-inventory/internal/usecase"
+	mongoConn "github.com/BeksultanSE/Assignment1-inventory/pkg/mongo"
 )
 
 const serviceName = "inventory-service"
@@ -50,7 +53,7 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 
 	// redis cache
 	productRedisCache := redis.NewRedisCache(redisClient, cfg.Cache.TTL)
-	
+
 	pUsecase := usecase.NewProduct(aiRepo, pRepo, productRedisCache)
 
 	//httpServer := httpRepo.New(cfg.Server, pUsecase)

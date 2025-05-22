@@ -1,12 +1,13 @@
 package handler
 
 import (
-	protos "github.com/BeksultanSE/Assignment1-api-gateway/pkg/protos/gen/golang"
-	"github.com/gin-gonic/gin"
-	"google.golang.org/protobuf/encoding/protojson"
 	"log"
 	"net/http"
 	"strconv"
+
+	protos "github.com/BeksultanSE/Assignment1-api-gateway/pkg/protos/gen/golang"
+	"github.com/gin-gonic/gin"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func (h *Handler) CreateOrder(c *gin.Context) {

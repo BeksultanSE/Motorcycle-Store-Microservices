@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+
 	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
 )
 

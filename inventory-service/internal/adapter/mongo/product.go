@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo/dao"
 	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"

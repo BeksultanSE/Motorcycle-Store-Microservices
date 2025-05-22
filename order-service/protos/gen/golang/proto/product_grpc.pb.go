@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.30.2
-// source: product.proto
+// source: protos/proto/product.proto
 
 package proto
 
@@ -19,12 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	InventoryService_CreateProduct_FullMethodName    = "/inventory.InventoryService/CreateProduct"
-	InventoryService_GetProduct_FullMethodName       = "/inventory.InventoryService/GetProduct"
-	InventoryService_UpdateProduct_FullMethodName    = "/inventory.InventoryService/UpdateProduct"
-	InventoryService_ListProducts_FullMethodName     = "/inventory.InventoryService/ListProducts"
-	InventoryService_DeleteProduct_FullMethodName    = "/inventory.InventoryService/DeleteProduct"
-	InventoryService_BatchUpdateStock_FullMethodName = "/inventory.InventoryService/BatchUpdateStock"
+	InventoryService_CreateProduct_FullMethodName = "/inventory.InventoryService/CreateProduct"
+	InventoryService_GetProduct_FullMethodName    = "/inventory.InventoryService/GetProduct"
+	InventoryService_UpdateProduct_FullMethodName = "/inventory.InventoryService/UpdateProduct"
+	InventoryService_ListProducts_FullMethodName  = "/inventory.InventoryService/ListProducts"
+	InventoryService_DeleteProduct_FullMethodName = "/inventory.InventoryService/DeleteProduct"
 )
 
 // InventoryServiceClient is the client API for InventoryService service.
@@ -36,7 +35,6 @@ type InventoryServiceClient interface {
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*ProductResponse, error)
 	ListProducts(ctx context.Context, in *ListProductsRequest, opts ...grpc.CallOption) (*ListProductsResponse, error)
 	DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*DeleteProductResponse, error)
-	BatchUpdateStock(ctx context.Context, in *BatchUpdateStockRequest, opts ...grpc.CallOption) (*BatchUpdateStockResponse, error)
 }
 
 type inventoryServiceClient struct {
@@ -97,16 +95,6 @@ func (c *inventoryServiceClient) DeleteProduct(ctx context.Context, in *DeletePr
 	return out, nil
 }
 
-func (c *inventoryServiceClient) BatchUpdateStock(ctx context.Context, in *BatchUpdateStockRequest, opts ...grpc.CallOption) (*BatchUpdateStockResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BatchUpdateStockResponse)
-	err := c.cc.Invoke(ctx, InventoryService_BatchUpdateStock_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // InventoryServiceServer is the server API for InventoryService service.
 // All implementations must embed UnimplementedInventoryServiceServer
 // for forward compatibility.
@@ -116,7 +104,6 @@ type InventoryServiceServer interface {
 	UpdateProduct(context.Context, *UpdateProductRequest) (*ProductResponse, error)
 	ListProducts(context.Context, *ListProductsRequest) (*ListProductsResponse, error)
 	DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error)
-	BatchUpdateStock(context.Context, *BatchUpdateStockRequest) (*BatchUpdateStockResponse, error)
 	mustEmbedUnimplementedInventoryServiceServer()
 }
 
@@ -141,9 +128,6 @@ func (UnimplementedInventoryServiceServer) ListProducts(context.Context, *ListPr
 }
 func (UnimplementedInventoryServiceServer) DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteProduct not implemented")
-}
-func (UnimplementedInventoryServiceServer) BatchUpdateStock(context.Context, *BatchUpdateStockRequest) (*BatchUpdateStockResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BatchUpdateStock not implemented")
 }
 func (UnimplementedInventoryServiceServer) mustEmbedUnimplementedInventoryServiceServer() {}
 func (UnimplementedInventoryServiceServer) testEmbeddedByValue()                          {}
@@ -256,24 +240,6 @@ func _InventoryService_DeleteProduct_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _InventoryService_BatchUpdateStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BatchUpdateStockRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(InventoryServiceServer).BatchUpdateStock(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: InventoryService_BatchUpdateStock_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InventoryServiceServer).BatchUpdateStock(ctx, req.(*BatchUpdateStockRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // InventoryService_ServiceDesc is the grpc.ServiceDesc for InventoryService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -301,11 +267,7 @@ var InventoryService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteProduct",
 			Handler:    _InventoryService_DeleteProduct_Handler,
 		},
-		{
-			MethodName: "BatchUpdateStock",
-			Handler:    _InventoryService_BatchUpdateStock_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "product.proto",
+	Metadata: "protos/proto/product.proto",
 }

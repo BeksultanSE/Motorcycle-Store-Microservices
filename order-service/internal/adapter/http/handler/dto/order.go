@@ -3,10 +3,11 @@ package dto
 import (
 	"encoding/json"
 	"errors"
-	"github.com/BeksultanSE/Assignment1-order/internal/domain"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+
+	"github.com/BeksultanSE/Assignment1-order/internal/domain"
+	"github.com/gin-gonic/gin"
 )
 
 // OrderRequest the request body for creating an order

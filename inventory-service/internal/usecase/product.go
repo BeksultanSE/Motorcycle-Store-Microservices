@@ -2,10 +2,11 @@ package usecase
 
 import (
 	"context"
-	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
-	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
 	"log"
 	"time"
+
+	"github.com/BeksultanSE/Assignment1-inventory/internal/adapter/mongo"
+	"github.com/BeksultanSE/Assignment1-inventory/internal/domain"
 )
 
 type Product struct {
@@ -70,7 +71,7 @@ func (p *Product) GetAll(ctx context.Context, pf domain.ProductFilter, page, lim
 }
 
 func (p *Product) Update(ctx context.Context, filter domain.ProductFilter, updated domain.ProductUpdateData) error {
-	if *updated.Stock < uint64(0) {
+	if updated.Stock != nil && *updated.Stock == 0 {
 		return domain.ErrInsufficientStock
 	}
 	updated.UpdatedAt = func() *time.Time { t := time.Now(); return &t }()

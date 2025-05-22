@@ -1,9 +1,10 @@
 package dto
 
 import (
+	"time"
+
 	"github.com/BeksultanSE/Assignment1-order/internal/domain"
 	order "github.com/BeksultanSE/Assignment1-order/protos/gen/golang"
-	"time"
 )
 
 type CreateOrderRequestDTO struct {

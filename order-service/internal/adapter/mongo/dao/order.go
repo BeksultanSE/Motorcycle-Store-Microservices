@@ -1,9 +1,10 @@
 package dao
 
 import (
+	"time"
+
 	"github.com/BeksultanSE/Assignment1-order/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
-	"time"
 )
 
 type Order struct {
