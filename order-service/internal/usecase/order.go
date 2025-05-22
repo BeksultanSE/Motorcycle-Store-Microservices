@@ -3,9 +3,10 @@ package usecase
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/BeksultanSE/Assignment1-order/internal/adapter/mongo"
 	"github.com/BeksultanSE/Assignment1-order/internal/domain"
-	"time"
 )
 
 type Order struct {
@@ -57,6 +58,9 @@ func (o *Order) Create(ctx context.Context, order domain.Order) (domain.Order, e
 		return domain.Order{}, err
 	}
 
+	// Set the ID before storing and publishing
+	order.ID = id
+
 	err = o.repo.Create(ctx, order, id)
 	if err != nil {
 		return domain.Order{}, err
@@ -67,7 +71,7 @@ func (o *Order) Create(ctx context.Context, order domain.Order) (domain.Order, e
 	}
 
 	return domain.Order{
-		ID:     order.ID,
+		ID:     id,
 		UserID: order.UserID,
 		Status: order.Status,
 		// Include other fields as necessary
