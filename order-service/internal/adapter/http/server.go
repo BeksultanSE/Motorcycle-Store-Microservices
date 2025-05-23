@@ -4,15 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/BeksultanSE/Assignment1-order/config"
-	"github.com/BeksultanSE/Assignment1-order/internal/adapter/http/handler"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/BeksultanSE/Assignment1-order/config"
+	"github.com/BeksultanSE/Assignment1-order/internal/adapter/http/handler"
+	"github.com/gin-gonic/gin"
 )
 
 const serverIPAddress = "0.0.0.0:%d" // Changed to 0.0.0.0 for external access

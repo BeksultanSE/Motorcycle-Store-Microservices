@@ -1,9 +1,10 @@
 package dao
 
 import (
+	"time"
+
 	domain "github.com/BeksultanSE/Assignment1-inventory/internal/domain"
 	"go.mongodb.org/mongo-driver/bson"
-	"time"
 )
 
 type Product struct {

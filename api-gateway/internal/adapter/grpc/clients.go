@@ -2,11 +2,12 @@ package grpc
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/BeksultanSE/Assignment1-api-gateway/config"
 	proto "github.com/BeksultanSE/Assignment1-api-gateway/pkg/protos/gen/golang"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 )
 
 type Clients struct {

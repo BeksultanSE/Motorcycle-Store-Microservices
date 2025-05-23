@@ -2,12 +2,13 @@ package handler
 
 import (
 	"errors"
-	"github.com/BeksultanSE/Assignment1-order/internal/adapter/http/handler/dto"
-	"github.com/BeksultanSE/Assignment1-order/internal/domain"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/BeksultanSE/Assignment1-order/internal/adapter/http/handler/dto"
+	"github.com/BeksultanSE/Assignment1-order/internal/domain"
+	"github.com/gin-gonic/gin"
 )
 
 type OrderHandler struct {

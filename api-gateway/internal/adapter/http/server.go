@@ -4,17 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/BeksultanSE/Assignment1-api-gateway/config"
-	"github.com/BeksultanSE/Assignment1-api-gateway/internal/adapter/http/handler"
-	"github.com/BeksultanSE/Assignment1-api-gateway/internal/adapter/http/middleware"
-	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/BeksultanSE/Assignment1-api-gateway/config"
+	"github.com/BeksultanSE/Assignment1-api-gateway/internal/adapter/http/handler"
+	"github.com/BeksultanSE/Assignment1-api-gateway/internal/adapter/http/middleware"
+	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const serverIPAddress = "0.0.0.0:%d"
